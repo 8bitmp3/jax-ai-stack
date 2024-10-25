@@ -1,4 +1,4 @@
----
+--
 jupytext:
   formats: ipynb,md:myst
   text_representation:
@@ -23,32 +23,30 @@ kernelspec:
 
 ## Who is this tutorial for?
 
-This tutorial is for those who want to get started using the JAX AI stack to build and train neural network models. It assumes some familiarity with numerical computing in Python with [NumPy](http://numpy.org), and assumes some conceptual familiarity with defining, training, and evaluating machine learning models.
+This tutorial is for those who want to get started using JAX and JAX-based AI libraries - the JAX AI stack - to build and train a simple neural network model. [JAX](http://jax.readthedocs.io) is a Python library for hardware accelerator-oriented array computation and program transformation, and is the engine behind cutting-edge AI research and production models at Google, Google DeepMind, and beyond. This tutorial assumes some familiarity with numerical computing in Python with [NumPy](http://numpy.org), and assumes some conceptual familiarity with defining, training, and evaluating machine learning models.
 
 +++ {"id": "1Y92oUSGeoRz"}
 
 ## What does this tutorial cover?
 
-JAX itself focuses on array-based computation, and is at the core of a growing ecosystem of domain-specific tools. This tutorial introduces part of that ecosystem that is useful for defininig and training AI models, including:
+JAX focuses on [array-based](https://jax.readthedocs.io/en/latest/key-concepts.html#jax-arrays-jax-array) computation, and is at the core of a growing ecosystem of domain-specific tools. This tutorial introduces part of that JAX ecosystem designed for AI-related tasks, including:
 
-- [flax](http://flax.readthedocs.io): a tool designed for defining and building
-  scalable neural networks using JAX.
-- [optax](http://optax.readthedocs.io): a tool designed for high-performance
-  optimization of functions in JAX, including the loss functions used in neural network training.
+- [Flax](http://flax.readthedocs.io): A machine learning library designed for defining and building scalable neural networks using JAX.
+- [Optax](http://optax.readthedocs.io): A high-performance function optimization library that comes with built-in optimizers and loss functions. It also allows you to create your own such functions.
 
-Once you've worked through this content, you may wish to visit http://jax.readthedocs.io/ for a deeper dive into the JAX library itself.
+Once you've worked through this content, you may wish to visit the [JAX documentation site](http://jax.readthedocs.io/) for a deeper dive into the core JAX concepts.
 
 +++ {"id": "z7sAr0sderhh"}
 
-## Example: a simple neural network with flax
+## Example: A simple neural network with Flax and Optax
 
-We'll start with a very quick example of what it looks like to use JAX with the [flax](https://flax.readthedocs.io) framework to define and train a very simple neural network to recognize hand-written digits.
+Let's start with a very simple example of what it is like to use JAX with [Flax](https://flax.readthedocs.io) to define a model, and train it on the hand-written digits dataset with the help of the [Optax](https://optax.readthedocs.io) optimization library.
 
 +++ {"id": "pOlnhK-EioSk"}
 
 ### Loading the data
 
-JAX can work with a variety of data loaders, but for simplicity here we can use the well-known [scikit-learn `digits`](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html) dataset.
+JAX can work with a variety of data loaders, including [Grain](https://github.com/google/grain), [TensorFlow Datasets](https://github.com/tensorflow/datasets) and [TorchData](https://github.com/pytorch/data), but for simplicity this example uses the well-known [scikit-learn `digits`](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html) dataset.
 
 ```{code-cell}
 :id: hKhPLnNxfOHU
@@ -63,7 +61,7 @@ print(f"{digits.target.shape=}")
 
 +++ {"id": "lst3E34dgrLc"}
 
-This dataset consists of 8x8 pixelized images of hand-written digits along with labels, and we can visualize a handful of them this way:
+This dataset consists of `8x8` pixelated images of hand-written digits and their corresponding labels. Let’s visualize a handful of them with [`matplotlib`](https://matplotlib.org/stable/tutorials/index):
 
 ```{code-cell}
 :id: Y8cMntSdfyyT
@@ -82,8 +80,8 @@ for i, ax in enumerate(axes.flat):
 
 +++ {"id": "Z3l45KgtfUUo"}
 
-Let's split these into a training and testing set, and convert these splits into JAX arrays which will be ready to feed into our model.
-We'll make use of the `jax.numpy` module, which provides a familiar NumPy-style API around JAX operations:
+Next, split the dataset into a training and testing set, and convert these splits into [`jax.Array`s]https://jax.readthedocs.io/en/latest/key-concepts.html#jax-arrays-jax-array) before you feed them into the model.
+You’ll use the `jax.numpy` module, which provides a familiar NumPy-style API around JAX operations:
 
 ```{code-cell}
 :id: 6jrYisoPh6TL
@@ -104,9 +102,9 @@ print(f"{images_test.shape=}  {label_test.shape=}")
 
 +++ {"id": "JzrixENjifiq"}
 
-### Defining the flax model
+### Defining the Flax model
 
-We can now use the [Flax](http://flax.readthedocs.io) package to create a simple [Feedforward](https://en.wikipedia.org/wiki/Feedforward_neural_network) neural network with one hidden layer, and use a *scaled exponential linear unit* (SELU) activation function.
+You can now use [Flax](http://flax.readthedocs.io) to create a simple [feed-forward](https://en.wikipedia.org/wiki/Feedforward_neural_network) neural network - subclassing [`flax.nnx.Module`](https://flax.readthedocs.io/en/latest/api_reference/flax.nnx/module.html#flax.nnx.Module) - with [`flax.nnx.Linear`](https://flax.readthedocs.io/en/latest/api_reference/flax.nnx/nn/linear.html#flax.nnx.Linear) layers with *scaled exponential linear unit* (SELU) activation function using the built-in [`flax.nnx.selu`](https://flax.readthedocs.io/en/latest/api_reference/flax.nnx/nn/activations.html#flax.nnx.selu):
 
 ```{code-cell}
 :id: U77VMQwRjTfH
@@ -135,6 +133,7 @@ nnx.display(model)  # Interactive display if penzai is installed.
 ```
 
 +++ {"id": "FIXmNs5-lrEf"}
+
 
 ### Training the model
 
